@@ -2,6 +2,11 @@
 
 This project implements a steganography application using the Discrete Wavelet Transform (DWT) method. The application allows users to embed secret messages into images and extract them later. It is built using Python and Streamlit for an interactive user interface.
 
+# Demo
+   ```
+   https://steganography-dwt.streamlit.app/
+   ```
+
 ---
 
 ## Installation and Running the Application
@@ -31,10 +36,9 @@ This project implements a steganography application using the Discrete Wavelet T
 4. Open your web browser and navigate to http://localhost:8501 to access the application.
 
 # Features
-
-    Embed Message: Hide a secret message inside an image using DWT.
-    Extract Message: Retrieve the hidden message from a stego image.
-    Supported Image Formats: PNG, JPG, BMP.
+   - Embed Message: Hide a secret message inside an image using DWT.
+   - Extract Message: Retrieve the hidden message from a stego image.
+   - Supported Image Formats: PNG, JPG, BMP.
 
 # How It Works
 
