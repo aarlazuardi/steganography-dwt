@@ -3,42 +3,56 @@ from PIL import Image
 from steg_functions import embed_message, extract_message
 from io import BytesIO
 
-# Function to reset session state when switching pages
 def reset_session_state_on_page_change(current_page):
     if st.session_state.get("current_page") != current_page:
         st.session_state.pop("stego_image", None)
-        st.session_state.pop("downloaded", None)  # Reset download status
+        st.session_state.pop("downloaded", None)
         st.session_state["current_page"] = current_page
+
+# Komponen header branding
+def render_header(title, subtitle):
+    st.markdown(f"""
+        <div style="text-align: center; margin-top: 20px; margin-bottom: 10px;">
+            <h1 style="font-size: 3em; margin-bottom: 0px;">🧠 SteCU</h1>
+            <p style="font-size: 1.1em; color: #6c757d; font-style: italic; margin-top: 0px; margin-bottom: 20px;">
+                Steganography Conceal Utility
+            </p>
+            <p style="font-size: 1.2em; color: #888;">{subtitle}</p>
+            <hr style="border: 1px solid #444; margin-top: 20px;">
+        </div>
+    """, unsafe_allow_html=True)
+    st.subheader(title)
+
 
 def embed_ui():
     reset_session_state_on_page_change("embed")
-    st.title("Embed Message into Image (DWT Method)")
+    render_header("Embed Message into Image", "Steganography using DWT Method")
 
-    uploaded_file = st.file_uploader("Upload Image (PNG/JPG/BMP)", type=["png", "jpg", "jpeg", "bmp"])
+    uploaded_file = st.file_uploader("📤 Upload Image (PNG / JPG / JPEG / BMP)", type=["png", "jpg", "jpeg", "bmp"])
 
-    # Clear stego_image if a different file is uploaded
     if uploaded_file is not None:
         uploaded_filename = uploaded_file.name
         if st.session_state.get("last_uploaded_filename") != uploaded_filename:
             st.session_state.pop("stego_image", None)
-            st.session_state.pop("downloaded", None)  # Reset download status
+            st.session_state.pop("downloaded", None)
         st.session_state["last_uploaded_filename"] = uploaded_filename
-
-    col1, col2 = st.columns(2)
 
     image = None
     if uploaded_file is not None:
         image = Image.open(uploaded_file).convert("RGB")
+
+    col1, col2 = st.columns(2)
+
+    if image:
         with col1:
             st.image(image, caption="Cover Image", use_container_width=True)
 
-    message = st.text_area("Enter the message to embed:")
+    message = st.text_area("💬 Enter the message to embed:")
 
     if st.button("📥 Embed Message"):
         if uploaded_file is None:
             st.warning("Please upload an image first.")
             return
-
         if message.strip() == "":
             st.warning("Message cannot be empty.")
             return
@@ -46,7 +60,7 @@ def embed_ui():
         try:
             stego_image = embed_message(image, message)
             st.session_state.stego_image = stego_image
-            st.session_state.downloaded = False  # Reset download status
+            st.session_state.downloaded = False
             st.success("✅ Message successfully embedded into the image!")
 
         except Exception as e:
@@ -59,7 +73,6 @@ def embed_ui():
         buffered = BytesIO()
         st.session_state.stego_image.save(buffered, format="PNG")
 
-        # Logic to hide the download button after one click
         if not st.session_state.get("downloaded", False):
             if st.download_button(
                 label="⬇️ Download Stego Image",
@@ -67,15 +80,15 @@ def embed_ui():
                 file_name="stego_image.png",
                 mime="image/png"
             ):
-                st.session_state.downloaded = True  # Mark download as completed
+                st.session_state.downloaded = True
         else:
-            st.warning("Stego image has already been downloaded.")
+            st.info("📁 Stego image has already been downloaded.")
 
 def extract_ui():
     reset_session_state_on_page_change("extract")
-    st.title("🔍 Extract Message from Image")
+    render_header("Extract Message from Image", "Steganography using DWT Method")
 
-    uploaded_file = st.file_uploader("Upload Image (PNG only for accurate results)", type=["png"])
+    uploaded_file = st.file_uploader("📤 Upload Image (PNG only for accurate results)", type=["png"])
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.image(image, caption="Stego Image", use_container_width=True)
